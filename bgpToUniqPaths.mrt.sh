@@ -32,7 +32,29 @@
 host=$1
 dataset=$2
 
-cd /media/sds-wd-1gb/sds/archive.routeviews.org/${dataset}/
+basedir="/media/sds-wd-1gb/sds/"
+pathsdir=$basedir/paths/$dataset/
+bgpdir=$basedir/archive.routeviews.org/${dataset}/bgpdata/
+subdir="RIBS"
+
+# Catch the unusual cases; really just 'oix-route-views'
+# (routeviews1), and 'bgpdata' (routeviews2).
+case "$dataset" in
+	"oix-route-views" )
+		pathsdir=$basedir/paths/route-views1
+		bgpdir=$basedir/archive.routeviews.org/$dataset
+		subdir=""
+		;;
+	"bgpdata" )
+		pathsdir=$basedir/paths/route-views2
+		bgpdir=$basedir/archive.routeviews.org/$dataset
+		subdir=""
+		;;
+	* )
+		echo "Unknown dataset!"
+		exit
+		;;
+esac
 
 for year in `seq 2008 2009` ; do
 	for file in *${year}*bz2 ; do
@@ -44,7 +66,7 @@ for year in `seq 2008 2009` ; do
 		cut -d "|" -f 7 | 
 		scala -cp ~/PhD/build/ com.sdstrowes.util.Uniq | 
 		bzip2 |
-		ssh makatea "cat > /media/sds-wd-1gb/sds/paths/'${dataset}'.routeviews.org/'${year}'/`basename '${file}' .bz2`.paths.bz2"
+		ssh carney "cat > /media/sds-wd-1gb/sds/paths/'${dataset}'.routeviews.org/'${year}'/`basename '${file}' .bz2`.paths.bz2"
 		rm /tmp/'${file}' '
 	done
 done

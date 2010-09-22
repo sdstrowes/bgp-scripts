@@ -47,6 +47,7 @@ for year in `seq 2007 2009` ; do
 		ssh ${host} <<EOF
 cat /tmp/${file} |
 bunzip2 |
+grep -v "closed" |
 awk -f /users/sds/PhD/bin/munge-bgp-table.awk |
 bzip2 > /tmp/${cleanfile}
 

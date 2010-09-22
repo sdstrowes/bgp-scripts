@@ -31,6 +31,8 @@
 # To get the RIBs for a collector
 # From /media/sds-wd-1gb/sds/ run:
 #wget --no-parent --accept html -e robots=off -r http://archive.routeviews.org/route-views.wide/
+# robots=off is bad; routeviews prefer users to not do this, or at
+# least throttle usage.
 
 files=`find . -name "index.html"  | grep RIBS`
 dates=`egrep -h -o "200[0-9][01][0-9][0-3][0-9]" $files | sort | uniq`

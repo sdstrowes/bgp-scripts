@@ -27,40 +27,29 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
 # POSSIBILITY OF SUCH DAMAGE.
 
-# Example: ./pathsToLinks.sh bo720-5-01 route-views.linx
+# Example: ./pathsToLinks.sh route-views.linx
 
-suffix=routeviews.org
-#suffix=oregon-ix.net
+dataset=$1
+basedir=/media/sds-wd-1gb/sds/
+classpath=~/PhD/build
 
-host=$1
-dataset=$2
-
-cd /media/sds-wd-1gb/sds/paths/${dataset}.${suffix}/
+cd $base/paths/$dataset
 
 startYear=`ls | sort -n | head -n 1`
 endYear=`ls | sort -n | tail -n 1`
 
 for year in `seq $startYear $endYear` ; do
 	for file in /media/sds-wd-1gb/sds/paths/${dataset}.${suffix}/${year}/*bz2 ; do
-		scp $file ${host}:/tmp/`basename ${file}` &> /dev/null
+		echo $file
 
-		file=`basename ${file}`
+		out=$basedir/links/$dataset/$year/`basename ${file} .paths.bz2`.links.bz2
 
-		echo $file; 
-
-		ssh ${host} <<EOF
-cat /tmp/${file} | 
-bunzip2 | 
-sed 's/[{}()]//g' | 
-sed 's/[0-9],[0-9,]*//g' |
-scala -cp ~/PhD/build com.sdstrowes.util.BGPPathsToLinks | 
-bzip2 |
-ssh $HOSTNAME "cat > /media/sds-wd-1gb/sds/links/${dataset}.${suffix}/${year}/`basename ${file} .paths.bz2`.links.bz2"
-rm /tmp/${file}
-EOF
+		cat $file | 
+		bunzip2 | 
+		sed 's/[{}()]//g' | 
+		sed 's/[0-9],[0-9,]*//g' |
+		scala -cp $classpath com.sdstrowes.util.BGPPathsToLinks | 
+		bzip2 > $out
 	done
 done
-echo "--" ${file}
 
-# /tmp/`basename ${file} .paths.bz2`.links.bz2
-# grep -v "," | 

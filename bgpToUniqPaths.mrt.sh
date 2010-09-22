@@ -27,12 +27,16 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
 # POSSIBILITY OF SUCH DAMAGE.
 
-# Example: ./bgpToUniqPaths.sh bo720-5-01 route-views.linx
+# Example: ./bgpToUniqPaths.sh route-views.linx
 
-host=$1
-dataset=$2
+dataset=$1
 
-basedir="/media/sds-wd-1gb/sds/"
+basedir=/media/sds-wd-1gb/sds/
+classpath=~/PhD/build/
+startyear=2008
+endyear=2009
+
+# These three variables may be reset in the following case statement.
 pathsdir=$basedir/paths/$dataset/
 bgpdir=$basedir/archive.routeviews.org/${dataset}/bgpdata/
 subdir="RIBS"
@@ -56,17 +60,16 @@ case "$dataset" in
 		;;
 esac
 
-for year in `seq 2008 2009` ; do
+for year in `seq $startyear $endyear` ; do
 	for file in *${year}*bz2 ; do
-		echo ${file}
-		scp $file ${host}:/tmp/${file} &> /dev/null
-		ssh ${host} 'cat /tmp/'${file}' |
+		echo $file
+		out=$basedir/paths/$dataset/$year/`basename '${file}' .bz2`.paths.bz2
+
+		cat $file |
 		bunzip2 | 
 		bgpdump -m - | 
 		cut -d "|" -f 7 | 
-		scala -cp ~/PhD/build/ com.sdstrowes.util.Uniq | 
-		bzip2 |
-		ssh carney "cat > /media/sds-wd-1gb/sds/paths/'${dataset}'.routeviews.org/'${year}'/`basename '${file}' .bz2`.paths.bz2"
-		rm /tmp/'${file}' '
+		scala -cp $classpath com.sdstrowes.util.Uniq | 
+		bzip2 > $out
 	done
 done

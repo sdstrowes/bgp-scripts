@@ -27,48 +27,37 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
 # POSSIBILITY OF SUCH DAMAGE.
 
-# Example: ./bgpToUniqPaths.sh bo720-5-01 oix-route-views
+# Example: ./bgpToUniqPaths.sh oix-route-views
 
-host=$1
-dataset=$2
+dataset=$1
 
-cd /media/sds-wd-1gb/sds/archive.routeviews.org/${dataset}/
+startyear=2007
+endyear=2009
 
-# BGP paths to unique paths (chop off any prefixes in input prior to running 
-# this):
-for year in `seq 2007 2009` ; do
+basedir=/media/sds-wd-1gb/sds/
+
+cd $basedir/archive.routeviews.org/${dataset}/
+
+for year in `seq $startyear $endyear` ; do
 	for file in *${year}*bz2 ; do
 		echo ${file}
-		scp $file ${host}:/tmp/${file} &> /dev/null
 
 		file=`basename ${file}`
-		cleanfile=`basename ${file} .dat.bz2`.clean.bz2
+		cleanfile=$basedir/clean-tables/$dataset/$year/`basename ${file} .dat.bz2`.clean.bz2
+		pathsfile=$basedir/paths/$dataset/$year/`basename ${file} .dat.bz2`.paths.bz2
 
-		ssh ${host} <<EOF
-cat /tmp/${file} |
-bunzip2 |
-grep -v "closed" |
-awk -f /users/sds/PhD/bin/munge-bgp-table.awk |
-bzip2 > /tmp/${cleanfile}
+		# Generate a clean table from the Cisco text output.
+		cat ${file} |
+		bunzip2 |
+		grep -v "closed" |
+		awk -f /users/sds/PhD/bin/munge-bgp-table.awk |
+		bzip2 > $cleanfile
 
-scp /tmp/${cleanfile} makatea:/media/sds-wd-1gb/sds/clean-tables/${dataset}.routeviews.org/${year}/
-
-cat /tmp/${cleanfile} |
-bunzip2 |
-cut -d " " -f 2- | 
-scala -cp ~/PhD/build/ com.sdstrowes.util.Uniq | 
-bzip2 |
-ssh makatea "cat > /media/sds-wd-1gb/sds/paths/${dataset}.routeviews.org/${year}/`basename ${cleanfile} .clean.bz2`.paths.bz2"
-
-rm /tmp/${file}
-rm /tmp/${cleanfile}
-
-EOF
-
-#		cat ${file} |
-#		bunzip2 |
-#		cut -d " " -f 2- | 
-#		scala -cp ~/PhD/build/ com.sdstrowes.util.Uniq | 
-#		bzip2 > /media/sds-wd-1gb/sds/links/route-views.oregon-ix.net/${year}/`basename ${file} .clean.bz2`.paths.bz2
+		# Generate uniq set of paths from cleaned-up BGP table
+		cat ${cleanfile} |
+		bunzip2 |
+		cut -d " " -f 2- | 
+		scala -cp ~/PhD/build/ com.sdstrowes.util.Uniq | 
+		bzip2 > $pathsfile
 	done
 done

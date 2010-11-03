@@ -47,15 +47,13 @@ for year in `seq $startyear $endyear` ; do
 		pathsfile=$basedir/paths/$dataset/$year/`basename ${file} .dat.bz2`.paths.bz2
 
 		# Generate a clean table from the Cisco text output.
-		cat ${file} |
-		bunzip2 |
+		bzcat ${file} |
 		grep -v "closed" |
 		awk -f /users/sds/PhD/bin/munge-bgp-table.awk |
 		bzip2 > $cleanfile
 
 		# Generate uniq set of paths from cleaned-up BGP table
-		cat ${cleanfile} |
-		bunzip2 |
+		bzcat ${cleanfile} |
 		cut -d " " -f 2- | 
 		scala -cp ~/PhD/build/ com.sdstrowes.util.Uniq | 
 		bzip2 > $pathsfile

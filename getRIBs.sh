@@ -35,10 +35,90 @@
 # robots=off is bad; routeviews prefer users to not do this, or at
 # least throttle usage.
 
-files=`find . -name "index.html"  | grep RIBS`
-dates=`egrep -h -o "200[0-9][01][0-9][0-3][0-9]" $files | sort | uniq`
+
+cd /mnt/ext/sds/
+
+# repositories="http://archive.routeviews.org/route-views.eqix/bgpdata
+#  http://archive.routeviews.org/route-views.isc/bgpdata
+#  http://archive.routeviews.org/route-views.kixp/bgpdata
+#  http://archive.routeviews.org/route-views.linx/bgpdata
+#  http://archive.routeviews.org/route-views.wide/bgpdata
+#  http://archive.routeviews.org/route-views4/bgpdata"
+
+repositories="http://archive.routeviews.org/route-views3"
+
+# Given two dates and a collector
+collector=$1
+start=$2
+end=`date --date "$3 + 1 day" +%Y-%m-%d`
+
+cisco=1
+
+for r in $repositories ; do 
+	echo "--> $r"
+
+	date=$start
+	end_month=`date --date "$end + 1 month" +%Y-%m`
+	until [ `date --date $date +%Y-%m` == $end_month ]
+	do
+		echo "--> $date"
+
+		month=`date --date $date +%m`
+		year=`date --date $date +%Y`
+
+		echo "--> $month $year"
+
+		if [ $cisco -eq 1 ]
+		then
+			wget --quiet -O index.tmp.html $r/$year.$month/
+		else
+			wget --quiet -O index.tmp.html $r/$year.$month/RIBS/
+		fi
+
+		if [ $cisco -eq 1 ]
+		then
+			files=`egrep -o "[a-z0-9-]*[12][0-9]{3}-[0-9]{2}-[0-9]{2}-[0-9]{4}.dat.bz2" index.tmp.html | sort -k2,2 | uniq`
+			dates=`echo $files | sed 's/ /\n/g'| egrep -o "[12][0-9]{3}-[012][0-9]-[0-3][0-9]" | sort | uniq`
+		else
+			files=`egrep -o "rib.[12][0-9]{7}.[0-9]{4}.bz2" index.tmp.html | sort -k2,2 | uniq`
+			dates=`echo $files | sed 's/ /\n/g'| awk 'BEGIN {FS="."} {print $2}' | sort | uniq`
+		fi
+
+		for i in $dates
+		do
+			file=`echo $files | sed 's/ /\n/g' | grep $i | head -n1`
+
+			if [ $cisco -eq 1 ]
+			then
+				echo "Getting: $r/$year.$month/$file"
+				wget --quiet -x $r/$year.$month/$file
+			else
+				echo "Getting: $r/$year.$month/RIBS/$file"
+				wget --quiet -x $r/$year.$month/RIBS/$file
+			fi
+		done
+
+		rm index.tmp.html
+
+		date=`date --date "$date + 1 month" +%Y-%m-%d`
+	done
+done
+
+exit
+
+
+#files=`find . -name "index.html"  | grep RIBS`
+#dates=`egrep -h -o "200[0-9][01][0-9][0-3][0-9]" $files | sort | uniq`
+
+dates=`egrep -h -o "2010" index.*`
 
 # Get the filenames to retreive
-for i in ${dates[@]} ; do echo -n "http://archive.routeviews.org/route-views.eqix/bgpdata/${i:0:4}.${i:4:2}/RIBS/"; grep $i bgpdata/${i:0:4}.${i:4:2}/RIBS/index.html | cut -d "\"" -f 8 | head -n 1; done > urls
+for i in ${dates[@]}
+do
+	echo -n "http://archive.routeviews.org/route-views.eqix/bgpdata/${i:0:4}.${i:4:2}/RIBS/"
+	grep $i bgpdata/${i:0:4}.${i:4:2}/RIBS/index.html |
+	cut -d "\"" -f 8 |
+	head -n 1
+done > urls
 
 wget -e robots=off `cat urls `

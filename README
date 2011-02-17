@@ -1,5 +1,6 @@
 bgppp -- BGP Pull and Process
-
+Stephen D. Strowes,
+sds@dcs.gla.ac.uk
 
 Background
 ----------
@@ -59,7 +60,6 @@ fuller map of the AS graph.
 
 Contact
 -------
-Do feel free to feed back comments or fixes to Stephen Strowes,
-sds@dcs.gla.ac.uk
+Do feel free to feed back comments or fixes to sds@dcs.gla.ac.uk
 
 

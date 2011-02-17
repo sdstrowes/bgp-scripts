@@ -26,7 +26,6 @@ to be read by humans, and it has changed over time.
 
 The scripts
 -----------
-
 bgppp.sh is my primary script, and it's run regularly via cron. The
 various helper scripts it uses, in order, are:
 

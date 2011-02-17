@@ -27,35 +27,36 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
 # POSSIBILITY OF SUCH DAMAGE.
 
-# Example: ./bgpToUniqPaths.sh oix-route-views
 
-dataset=$1
+classpath=~/build/
 
-startyear=2007
-endyear=2009
-
-basedir=/media/sds-wd-1gb/sds/
-
-cd $basedir/archive.routeviews.org/${dataset}/
-
-for year in `seq $startyear $endyear` ; do
-	for file in *${year}*bz2 ; do
-		echo ${file}
-
-		file=`basename ${file}`
-		cleanfile=$basedir/clean-tables/$dataset/$year/`basename ${file} .dat.bz2`.clean.bz2
-		pathsfile=$basedir/paths/$dataset/$year/`basename ${file} .dat.bz2`.paths.bz2
-
-		# Generate a clean table from the Cisco text output.
-		bzcat ${file} |
-		grep -v "closed" |
-		awk -f /users/sds/PhD/bin/munge-bgp-table.awk |
-		bzip2 > $cleanfile
-
-		# Generate uniq set of paths from cleaned-up BGP table
-		bzcat ${cleanfile} |
-		cut -d " " -f 2- | 
-		scala -cp ~/PhD/build/ com.sdstrowes.util.Uniq | 
-		bzip2 > $pathsfile
-	done
+while getopts  "i:o:d:" flag
+do
+	case $flag in
+		i) inputdir=$OPTARG
+			;;
+		o) outputdir=$OPTARG
+			;;
+		d) date_string=$OPTARG
+			;;
+	esac
 done
+
+if [ ! $inputdir ] || [ ! $outputdir ] || [ ! $date_string ]
+then
+	echo "Usage: $0 -i <input directory> -o <output directory> -d <date>"
+	exit
+fi
+
+year=`date --date $date_string +%Y`
+month=`date --date $date_string +%m`
+day=`date --date $date_string +%d`
+
+inputs=`find $inputdir -regex ".*$year-?$month-?$day.*"`
+
+for f in $inputs
+do
+	bzcat $f
+done |
+scala -cp $classpath com.sdstrowes.util.Uniq |
+bzip2 > $outputdir/all.${year}${month}${day}.links.bz2

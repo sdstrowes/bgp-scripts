@@ -28,29 +28,27 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 
-# Example: ./pathsToLinks.sh route-views.linx
+classpath=~/build/
 
-dataset=$1
-basedir=/media/sds-wd-1gb/sds/
-classpath=~/PhD/build
-
-cd $base/paths/$dataset
-
-startYear=`ls | sort -n | head -n 1`
-endYear=`ls | sort -n | tail -n 1`
-
-for year in `seq $startYear $endYear` ; do
-	for file in /media/sds-wd-1gb/sds/paths/${dataset}.${suffix}/${year}/*bz2 ; do
-		echo $file
-
-		out=$basedir/links/$dataset/$year/`basename ${file} .paths.bz2`.links.bz2
-
-		cat $file | 
-		bunzip2 | 
-		sed 's/[{}()]//g' | 
-		sed 's/[0-9],[0-9,]*//g' |
-		scala -cp $classpath com.sdstrowes.util.BGPPathsToLinks | 
-		bzip2 > $out
-	done
+while getopts  "i:o:" flag
+do
+	case $flag in
+		i) input=$OPTARG
+			;;
+		o) output=$OPTARG
+			;;
+	esac
 done
 
+if [ ! $input ] || [ ! $output ]
+then
+	echo "Usage: $0 -i <input.bz2> -o <output.bz2>"
+	exit
+fi
+
+
+bzcat $input | 
+sed 's/[{}()]//g' | 
+sed 's/[0-9],[0-9,]*//g' |
+scala -cp $classpath com.sdstrowes.util.BGPPathsToLinks | 
+bzip2 > $output

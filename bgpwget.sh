@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Copyright (c) 2010, Stephen D. Strowes
+# Copyright (c) 2011, Stephen D. Strowes
 # All rights reserved.
 # 
 # Redistribution and use in source and binary forms, with or without 
@@ -50,40 +50,32 @@ then
 fi
 
 
+source repos.sh
+
 cd $outputdir
 
-mrt_repos="http://archive.routeviews.org/route-views.eqix/bgpdata
- http://archive.routeviews.org/route-views.isc/bgpdata
- http://archive.routeviews.org/route-views.kixp/bgpdata
- http://archive.routeviews.org/route-views.linx/bgpdata
- http://archive.routeviews.org/route-views.wide/bgpdata
- http://archive.routeviews.org/route-views4/bgpdata"
+# for r in $mrt_repos
+# do
+# 	day=`date --date $date_string +%d`
+# 	month=`date --date $date_string +%m`
+# 	year=`date --date $date_string +%Y`
 
-cisco_repos="http://archive.routeviews.org/oix-route-views
- http://archive.routeviews.org/route-views3"
+# 	echo "--> $r"
+# 	echo "--> $date_string"
+# 	echo "--> $month $year"
 
-for r in $mrt_repos
-do
-	day=`date --date $date_string +%d`
-	month=`date --date $date_string +%m`
-	year=`date --date $date_string +%Y`
+# 	wget --quiet -O /tmp/index.tmp.html $r/$year.$month/RIBS/
 
-	echo "--> $r"
-	echo "--> $date_string"
-	echo "--> $month $year"
+# 	all_files=`egrep -o "rib.$year$month$day.[0-9]{4}.bz2" /tmp/index.tmp.html | sort -k1,1 | uniq`
+# 	file=`echo $all_files | sed 's/ /\n/g' | head -n1`
 
-	wget --quiet -O /tmp/index.tmp.html $r/$year.$month/RIBS/
+# 	echo "Getting: $r/$year.$month/RIBS/$file"
+# 	wget --quiet -x $r/$year.$month/RIBS/$file
 
-	all_files=`egrep -o "rib.$year$month$day.[0-9]{4}.bz2" /tmp/index.tmp.html | sort -k1,1 | uniq`
-	file=`echo $all_files | sed 's/ /\n/g' | head -n1`
+# 	sleep $DELAY
 
-	echo "Getting: $r/$year.$month/RIBS/$file"
-	wget --quiet -x $r/$year.$month/RIBS/$file
-
-	sleep $DELAY
-
-	rm /tmp/index.tmp.html
-done
+# 	rm /tmp/index.tmp.html
+# done
 
 for r in $cisco_repos
 do

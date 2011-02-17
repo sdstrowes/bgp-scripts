@@ -28,49 +28,36 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 
-# Example: ./bgpToUniqPaths.sh route-views.linx
+classpath=~/build/
 
-dataset=$1
-
-basedir=/media/sds-wd-1gb/sds/
-classpath=~/PhD/build/
-startyear=2008
-endyear=2009
-
-# These three variables may be reset in the following case statement.
-pathsdir=$basedir/paths/$dataset/
-bgpdir=$basedir/archive.routeviews.org/${dataset}/bgpdata/
-subdir="RIBS"
-
-# Catch the unusual cases; really just 'oix-route-views'
-# (routeviews1), and 'bgpdata' (routeviews2).
-case "$dataset" in
-	"oix-route-views" )
-		pathsdir=$basedir/paths/route-views1
-		bgpdir=$basedir/archive.routeviews.org/$dataset
-		subdir=""
-		;;
-	"bgpdata" )
-		pathsdir=$basedir/paths/route-views2
-		bgpdir=$basedir/archive.routeviews.org/$dataset
-		subdir=""
-		;;
-	* )
-		echo "Unknown dataset!"
-		exit
-		;;
-esac
-
-for year in `seq $startyear $endyear` ; do
-	for file in *${year}*bz2 ; do
-		echo $file
-		out=$basedir/paths/$dataset/$year/`basename '${file}' .bz2`.paths.bz2
-
-		cat $file |
-		bunzip2 | 
-		bgpdump -m - | 
-		cut -d "|" -f 7 | 
-		scala -cp $classpath com.sdstrowes.util.Uniq | 
-		bzip2 > $out
-	done
+while getopts  "i:o:c" flag
+do
+	case $flag in
+		i) input=$OPTARG
+			;;
+		o) output=$OPTARG
+			;;
+		c) clean=1
+			;;
+	esac
 done
+
+if [ ! $input ] || [ ! $output ]
+then
+	echo "Usage: $0 -i <input.bz2> -o <output.bz2> -c"
+	exit
+fi
+
+mkdir -p `dirname $output`
+
+bzcat $input |
+if [ $clean ]
+then
+	awk -f bgp-clean-cisco-table.awk |
+	cut -d " " -f2-
+else
+	bgpdump -m - | 
+	awk 'BEGIN {FS="|"} {print $7}' 
+fi | 
+scala -cp $classpath com.sdstrowes.util.Uniq | 
+bzip2 > $output

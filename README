@@ -1,0 +1,63 @@
+bgppp -- BGP Pull and Process
+
+
+Background
+----------
+I regularly pull data from Route Views for use in my research. The
+naming schemes between collectors differs in places, and the BGP data
+arrives in different formats. The data in its raw form is not so
+especially useful.
+
+What is useful, however, is the unique collection of paths toward each
+router, the collection of (AS-level) links observed by each router,
+and the aggregate of these.
+
+I use these scripts to pull down current Route Views data and mash it
+together into more immediately useful forms. Given the differing
+naming schemes and data formats, the scripts help avoid little
+mistakes.
+
+The grubbiest part of the collection is the AWK script to cleanse the
+Cisco-format BGP data. This is grubby because the output is intended
+to be read by humans, and it has changed over time.
+
+
+
+The scripts
+-----------
+
+bgppp.sh is my primary script, and it's run regularly via cron. The
+various helper scripts it uses, in order, are:
+
+
+- bgpwget.sh
+
+'BGP wget'. Pulls down a Route Views snapshot from the various
+collectors for a specific date.
+
+
+- bgptouniqpaths.sh
+
+'BGP to uniq paths'. It accepts data in Cisco or MRT format, with MRT
+being the default. The "-c" option assumes Cisco data, which requires
+a cleansing process to pull out the paths easily. The script calls
+bgp-clean-cisco-table.awk for the cleansing.
+
+
+- bgppathstolinks.sh
+
+'BGP paths to links'. Given the set of paths, this script boils the
+paths down to AS adjacencies.
+
+
+- bgpaggregatelinks.sh
+
+'BGP aggregate links'. Aggregates all the links discovered into one
+fuller map of the AS graph.
+
+
+
+Contact
+-------
+Do feel free to feed back comments or fixes to Stephen Strowes,
+sds@dcs.gla.ac.uk

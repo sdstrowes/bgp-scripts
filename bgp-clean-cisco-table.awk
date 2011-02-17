@@ -1,4 +1,4 @@
-# Copyright (c) 2010, Stephen D. Strowes
+# Copyright (c) 2011, Stephen D. Strowes
 # All rights reserved.
 # 
 # Redistribution and use in source and binary forms, with or without 

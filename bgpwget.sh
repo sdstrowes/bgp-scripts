@@ -50,32 +50,32 @@ then
 fi
 
 
-source repos.sh
+source bgprepos.sh
 
 cd $outputdir
 
-# for r in $mrt_repos
-# do
-# 	day=`date --date $date_string +%d`
-# 	month=`date --date $date_string +%m`
-# 	year=`date --date $date_string +%Y`
+for r in $mrt_repos
+do
+	day=`date --date $date_string +%d`
+	month=`date --date $date_string +%m`
+	year=`date --date $date_string +%Y`
 
-# 	echo "--> $r"
-# 	echo "--> $date_string"
-# 	echo "--> $month $year"
+	echo "--> $r"
+	echo "--> $date_string"
+	echo "--> $month $year"
 
-# 	wget --quiet -O /tmp/index.tmp.html $r/$year.$month/RIBS/
+	wget --quiet -O /tmp/index.tmp.html $r/$year.$month/RIBS/
 
-# 	all_files=`egrep -o "rib.$year$month$day.[0-9]{4}.bz2" /tmp/index.tmp.html | sort -k1,1 | uniq`
-# 	file=`echo $all_files | sed 's/ /\n/g' | head -n1`
+	all_files=`egrep -o "rib.$year$month$day.[0-9]{4}.bz2" /tmp/index.tmp.html | sort -k1,1 | uniq`
+	file=`echo $all_files | sed 's/ /\n/g' | head -n1`
 
-# 	echo "Getting: $r/$year.$month/RIBS/$file"
-# 	wget --quiet -x $r/$year.$month/RIBS/$file
+	echo "Getting: $r/$year.$month/RIBS/$file"
+	wget --quiet -x $r/$year.$month/RIBS/$file
 
-# 	sleep $DELAY
+	sleep $DELAY
 
-# 	rm /tmp/index.tmp.html
-# done
+	rm /tmp/index.tmp.html
+done
 
 for r in $cisco_repos
 do

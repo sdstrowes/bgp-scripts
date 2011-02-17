@@ -52,18 +52,15 @@ do
 	esac
 done
 
-if [ ! $bgp_data_dir ] || [ ! $path_data_dir ] || [ ! $date_string ]
+if [ ! $bgp_data_dir ] || [ ! $path_data_dir ] || [ ! $links_data_dir ]|| [ ! $date_string ]
 then
-	echo "Usage: $0 -b <bgp storage directory> -l <links storage directory> -d <date>"
-	echo "Optional parameters:"
-	echo "	-p <path storage directory>"
-	echo "	-o <aggregated links directory>"
-	echo "If -p is omitted, then path data is thrown away. If -o is provided, then the "
-	echo "paths generated will be aggregated, and stored in that location."
+	echo "Usage: $0 -b <bgp storage directory> -l <links storage directory> -p <path storage directory> -o <aggregated links directory> -d <date>"
+	echo "\t-o is optional. If it is provided, then the paths generated will be"
+	echo "\t   aggregated, and stored in that location."
 	exit
 fi
 
-#./wget_ribs.sh -o $bgp_data_dir -d $date_string
+./bgpwget.sh -o $bgp_data_dir -d $date_string
 
 source bgprepos.sh
 
@@ -154,9 +151,10 @@ do
 	fi
 done
 
-
-echo "-- Aggregating."
-./bgpaggregatelinks.sh -i /mnt/ext/sds/links -o /mnt/ext/sds/bgp-links-aggregated -d $date_string
-
+if [ $aggregate_links_dir ]
+then
+	echo "-- Aggregating."
+	./bgpaggregatelinks.sh -i /mnt/ext/sds/links -o /mnt/ext/sds/bgp-links-aggregated -d $date_string
+fi
 
 echo "-- Done."

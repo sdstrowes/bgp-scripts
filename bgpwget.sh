@@ -66,6 +66,9 @@ do
 
 	wget --quiet -O /tmp/index.tmp.html $r/$year.$month/RIBS/
 
+	ls -l /tmp/index.tmp.html
+	egrep -o "rib.$year$month$day.[0-9]{4}.bz2" /tmp/index.tmp.html | sort -k1,1 | uniq
+
 	all_files=`egrep -o "rib.$year$month$day.[0-9]{4}.bz2" /tmp/index.tmp.html | sort -k1,1 | uniq`
 	file=`echo $all_files | sed 's/ /\n/g' | head -n1`
 

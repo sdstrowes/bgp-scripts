@@ -28,7 +28,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 
-classpath=~/build/
+classpath=/home/sds/src/target/scala_2.8.0-local/classes/
 
 while getopts  "i:o:d:" flag
 do

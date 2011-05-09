@@ -27,8 +27,8 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
 # POSSIBILITY OF SUCH DAMAGE.
 
-
-classpath=~/build/
+path=/home/sds/release/bgp\ scripts/
+classpath=/home/sds/src/target/scala_2.8.0-local/classes/
 
 while getopts  "i:o:c" flag
 do
@@ -53,7 +53,7 @@ mkdir -p `dirname $output`
 bzcat $input |
 if [ $clean ]
 then
-	awk -f bgp-clean-cisco-table.awk |
+	awk -f "$path/bgp-clean-cisco-table.awk" |
 	cut -d " " -f2-
 else
 	bgpdump -m - | 

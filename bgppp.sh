@@ -33,8 +33,9 @@
 # - extract all AS pairs in the path data to construct links
 # - aggregate links together to create a complete map
 
-
-classpath=~/build/
+path=/home/sds/release/bgp\ scripts/
+PATH=$PATH:$path
+classpath=/home/sds/src/target/scala_2.8.0-local/classes/
 
 while getopts  "b:p:l:o:d:" flag
 do
@@ -60,7 +61,7 @@ then
 	exit
 fi
 
-./bgpwget.sh -o $bgp_data_dir -d $date_string
+bgpwget.sh -o $bgp_data_dir -d $date_string
 
 source bgprepos.sh
 
@@ -85,7 +86,7 @@ do
 
 		echo "Converting BGP $f to $outdir/`basename $f .bz2`.paths.bz2"
 
-		./bgptouniqpaths.sh -i $f -o $outdir/`basename $f .bz2`.paths.bz2
+		bgptouniqpaths.sh -i $f -o $outdir/`basename $f .bz2`.paths.bz2
 	done
 done
 for r in `echo $cisco_repos | sed 's$http://$$g'`
@@ -109,7 +110,7 @@ do
 		do
 			echo "Converting BGP $f to $outdir/`basename $f .bz2`.paths.bz2"
 
-			./bgptouniqpaths.sh -i $f -o $outdir/`basename $f .bz2`.paths.bz2 -c
+			bgptouniqpaths.sh -i $f -o $outdir/`basename $f .bz2`.paths.bz2 -c
 		done
 	fi
 done
@@ -129,7 +130,7 @@ do
 		do
 			out=$links_data_dir/`basename $f | sed s/paths/links/g`
 			mkdir -p `dirname $out`
-			./bgppathstolinks.sh -i $f -o $out
+			bgppathstolinks.sh -i $f -o $out
 		done
 	fi
 done
@@ -146,7 +147,7 @@ do
 		do
 			out=$links_data_dir/`basename $f | sed s/paths/links/g`
 			mkdir -p `dirname $out`
-			./bgppathstolinks.sh -i $f -o $out
+			bgppathstolinks.sh -i $f -o $out
 		done
 	fi
 done
@@ -154,7 +155,7 @@ done
 if [ $aggregate_links_dir ]
 then
 	echo "-- Aggregating."
-	./bgpaggregatelinks.sh -i /mnt/ext/sds/links -o /mnt/ext/sds/bgp-links-aggregated -d $date_string
+	bgpaggregatelinks.sh -i /mnt/ext/sds/links -o /mnt/ext/sds/bgp-links-aggregated -d $date_string
 fi
 
 echo "-- Done."

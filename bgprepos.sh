@@ -4,7 +4,10 @@ mrt_repos="http://archive.routeviews.org/route-views.eqix/bgpdata
  http://archive.routeviews.org/route-views.kixp/bgpdata
  http://archive.routeviews.org/route-views.linx/bgpdata
  http://archive.routeviews.org/route-views.wide/bgpdata
- http://archive.routeviews.org/route-views4/bgpdata"
+ http://archive.routeviews.org/route-views4/bgpdata
+ http://archive.routeviews.org/bgpdata
+ http://archive.routeviews.org/route-views.sydney/bgpdata
+ http://archive.routeviews.org/route-views.saopaulo/bgpdata"
 
 cisco_repos="http://archive.routeviews.org/oix-route-views
  http://archive.routeviews.org/route-views3"
@@ -18,7 +21,10 @@ mrt_local_tags="route-views.eqix
  route-views.kixp
  route-views.linx
  route-views.wide
- route-views.4"
+ route-views.4
+ route-views.2
+ route-views.sydney
+ route-views.saopaulo"
 
 cisco_local_tags="route-views.1
  route-views.3"

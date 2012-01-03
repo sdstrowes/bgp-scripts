@@ -40,13 +40,38 @@
 	# Older tables contain assignments which don't list CIDR-style
 	# netmasks.
 	if (match(prefix, "[.]0[.]0[.]0$")) {
-		prefix = prefix"/8"
+		first_octet = split(prefix, tmp, ".")
+		if (first_octet < 128) {
+			prefix = prefix"/8"
+		}
+		else if (first_octet < 192) {
+			prefix = prefix"/16"
+		}
+		else if (first_octet < 224) {
+			prefix = prefix"/24"
+		}
+		else {
+			printf "prefix",prefix," is abnormal!" >"/dev/stderr"
+		}
 	}
 	else if (match(prefix, "[.]0[.]0$")) {
-		prefix = prefix"/16"
+		if (first_octet < 192) {
+			prefix = prefix"/16"
+		}
+		else if (first_octet < 224) {
+			prefix = prefix"/24"
+		}
+		else {
+			printf "prefix",prefix," is abnormal!" >"/dev/stderr"
+		}
 	}
 	else if (match(prefix, "[.]0$")) {
-		prefix = prefix"/24"
+		if (first_octet < 224) {
+			prefix = prefix"/24"
+		}
+		else {
+			printf "prefix",prefix," is abnormal!" >"/dev/stderr"
+		}
 	}
 
 	# Chop off additional chars in columns which have run together.

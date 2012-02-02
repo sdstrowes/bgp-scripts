@@ -82,7 +82,7 @@
 
 	if (NF > 3) {
 		printf "%s", prefix
-		for (i = 5; i < NF; i++) {
+		for (i = 5; i <= NF; i++) {
 			if ($i != "0") { # This will skip over leading zeroes in the
 							 # 'weight' column.
 				printf " %s", $i
@@ -97,7 +97,7 @@
 	if (prefix) {
 		if (NF >= 3) {
 			printf "%s", prefix
-			for (i = 3; i < NF; i++) {
+			for (i = 3; i <= NF; i++) {
 				if ($i != "0") { # This will skip over leading zeroes in
 				   				 # the 'weight' column.
 					printf " %s", $i
@@ -113,7 +113,7 @@
 	if (prefix) {
 		if (NF > 3) {
 			printf "%s", prefix
-			for (i = 4; i < NF; i++) {
+			for (i = 4; i <= NF; i++) {
 				if ($i != "0") { # This will skip over leading zeroes in
 								 # the 'weight' column.
 					printf " %s", $i

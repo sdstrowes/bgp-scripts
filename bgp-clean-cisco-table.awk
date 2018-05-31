@@ -2,10 +2,6 @@
 # NOTE! THIS SCRIPT -REQUIRES- THAT THE INPUT FIRST BE REMOVED OF ALL
 # DOS NEWLINES; (dos2unix)
 
-#{
-#	print "##",$0
-#}
-
 # Matches lines which start with an asterisk, followed by one of the
 # valid flags the Cisco router may output.
 /^[\* ][ d>ih] [0-9]/ {
